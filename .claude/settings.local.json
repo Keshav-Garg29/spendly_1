@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python test_seed.py)",
+      "Bash(python test_fk.py)",
+      "Bash(python test_rowfactory.py)",
+      "Bash(python test_pragma.py)",
+      "Bash(taskkill /F /IM python.exe)",
+      "Bash(python app.py)",
+      "Bash(curl -s http://localhost:5001/)"
+    ]
+  }
+}
