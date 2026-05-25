@@ -9,7 +9,10 @@
       "Bash(python app.py)",
       "Bash(curl -s http://localhost:5001/)",
       "Bash(python *)",
-      "Bash(sqlite3 *)"
+      "Bash(sqlite3 *)",
+      "Bash(git checkout *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git apply *)"
     ]
   }
 }
