@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database.db import get_db, init_db, seed_db
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -18,6 +18,8 @@ with app.app_context():
 
 @app.route("/")
 def landing():
+    if session.get('user_id'):
+        return redirect(url_for('profile'))
     return render_template("landing.html")
 
 
@@ -155,14 +157,32 @@ def profile():
     if not user_id:
         return redirect(url_for('login', error="Please log in to access this page"))
 
-    conn = get_db()
-    try:
-        user = conn.execute("SELECT name, email FROM users WHERE id = ?", (user_id,)).fetchone()
-        if not user:
-            return redirect(url_for('logout'))
-        return render_template("profile.html", user=user)
-    finally:
-        conn.close()
+    # Hardcoded data for UI validation (Step 04)
+    user = {
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "created_at": "2024-01-15"
+    }
+    stats = {
+        "total_spent": 1420.00,
+        "total_expenses": 42,
+        "top_category": "Housing"
+    }
+    transactions = [
+        {"date": "2024-05-20", "description": "Grocery Store", "category": "Food & Dining", "amount": -45.00},
+        {"date": "2024-05-18", "description": "Monthly Rent", "category": "Housing", "amount": -1200.00},
+        {"date": "2024-05-15", "description": "Gas Station", "category": "Transport", "amount": -60.00},
+        {"date": "2024-05-12", "description": "Netflix", "category": "Entertainment", "amount": -40.00},
+    ]
+    category_breakdown = [
+        {"category": "Housing", "amount": 1200, "percentage": 84.5},
+        {"category": "Food & Dining", "amount": 120, "percentage": 8.5},
+        {"category": "Transport", "amount": 60, "percentage": 4.2},
+        {"category": "Entertainment", "amount": 40, "percentage": 2.8},
+    ]
+
+    return render_template("profile.html", user=user, stats=stats, transactions=transactions, category_breakdown=category_breakdown)
+
 
 
 @app.route("/expenses/add")
