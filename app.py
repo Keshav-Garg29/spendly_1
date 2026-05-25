@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from database.db import get_db, init_db, seed_db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key-for-spendly"
 
 # Initialize database on startup
 with app.app_context():
@@ -22,6 +23,8 @@ def landing():
 
 @app.route("/register")
 def register():
+    if session.get('user_id'):
+        return redirect(url_for('profile'))
     error = request.args.get('error')
     success = request.args.get('success')
     return render_template("register.html", error=error, success=success)
@@ -95,8 +98,32 @@ def register_post():
         conn.close()
 
 
+@app.route("/login", methods=["POST"])
+def login_post():
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '')
+
+    if not email or not password:
+        return redirect(url_for('login', error="Email and password are required"))
+
+    conn = get_db()
+    try:
+        cursor = conn.execute("SELECT id, password_hash FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+
+        if user and check_password_hash(user['password_hash'], password):
+            session['user_id'] = user['id']
+            return redirect(url_for('profile'))
+        else:
+            return redirect(url_for('login', error="Invalid email or password"))
+    finally:
+        conn.close()
+
+
 @app.route("/login")
 def login():
+    if session.get('user_id'):
+        return redirect(url_for('profile'))
     error = request.args.get('error')
     success = request.args.get('success')
     return render_template("login.html", error=error, success=success)
@@ -118,12 +145,24 @@ def privacy():
 
 @app.route("/logout")
 def logout():
-    return "Logout — coming in Step 3"
+    session.clear()
+    return redirect(url_for('landing'))
 
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to access this page"))
+
+    conn = get_db()
+    try:
+        user = conn.execute("SELECT name, email FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            return redirect(url_for('logout'))
+        return render_template("profile.html", user=user)
+    finally:
+        conn.close()
 
 
 @app.route("/expenses/add")
