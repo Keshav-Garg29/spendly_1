@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">Your Profile</h1>
+            <p class="profile-subtitle">Manage your account settings and view your financial summary</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-info">
+                <div class="info-group">
+                    <label>Full Name</label>
+                    <p class="info-value">{{ user.name }}</p>
+                </div>
+                <div class="info-group">
+                    <label>Email Address</label>
+                    <p class="info-value">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <a href="#" class="btn-secondary">Edit Profile</a>
+            </div>
+        </div>
+
+        <div class="profile-summary">
+            <h2 class="summary-title">Account Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label">Total Expenses</span>
+                    <span class="summary-value">₹0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Monthly Budget</span>
+                    <span class="summary-value">Not set</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .profile-section {
+        padding: 4rem 1rem;
+        display: flex;
+        justify-content: center;
+    }
+    .profile-container {
+        max-width: 800px;
+        width: 100%;
+    }
+    .profile-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .profile-title {
+        font-size: 2.5rem;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+    .profile-subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+    .profile-card {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .info-group label {
+        display: block;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+        letter-spacing: 0.05em;
+    }
+    .info-value {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--text-main);
+        margin: 0;
+    }
+    .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        text-decoration: none;
+        color: var(--text-main);
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+        background: var(--bg-hover);
+    }
+    .profile-summary {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+    .summary-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
+    }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    .summary-item {
+        padding: 1.5rem;
+        background: var(--bg-alt);
+        border-radius: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .summary-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    .summary-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+</style>
+{% endblock %}
