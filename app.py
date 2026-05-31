@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database.db import get_db, init_db, seed_db
+from database.db import get_db, init_db, seed_db, get_user_profile, get_user_summary, get_user_transactions, get_user_category_totals
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
@@ -157,31 +157,35 @@ def profile():
     if not user_id:
         return redirect(url_for('login', error="Please log in to access this page"))
 
-    # Hardcoded data for UI validation (Step 04)
-    user = {
-        "name": "John Doe",
-        "email": "john.doe@example.com",
-        "created_at": "2024-01-15"
-    }
-    stats = {
-        "total_spent": 1420.00,
-        "total_expenses": 42,
-        "top_category": "Housing"
-    }
-    transactions = [
-        {"date": "2024-05-20", "description": "Grocery Store", "category": "Food & Dining", "amount": -45.00},
-        {"date": "2024-05-18", "description": "Monthly Rent", "category": "Housing", "amount": -1200.00},
-        {"date": "2024-05-15", "description": "Gas Station", "category": "Transport", "amount": -60.00},
-        {"date": "2024-05-12", "description": "Netflix", "category": "Entertainment", "amount": -40.00},
-    ]
-    category_breakdown = [
-        {"category": "Housing", "amount": 1200, "percentage": 84.5},
-        {"category": "Food & Dining", "amount": 120, "percentage": 8.5},
-        {"category": "Transport", "amount": 60, "percentage": 4.2},
-        {"category": "Entertainment", "amount": 40, "percentage": 2.8},
-    ]
+    conn = get_db()
+    try:
+        # User profile data
+        user_row = get_user_profile(conn, user_id)
+        user = {
+            "name": user_row['name'],
+            "email": user_row['email'],
+            "created_at": user_row['created_at']
+        }
 
-    return render_template("profile.html", user=user, stats=stats, transactions=transactions, category_breakdown=category_breakdown)
+        # The following sections will be implemented by subagents
+        stats = get_user_summary(conn, user_id)
+
+        transactions = [dict(row) for row in get_user_transactions(conn, user_id)]
+
+        category_totals = get_user_category_totals(conn, user_id)
+        total_spent = stats['total_spent']
+        category_breakdown = [
+            {
+                "category": row['category'],
+                "amount": row['total'],
+                "percentage": round((row['total'] / total_spent * 100), 1) if total_spent > 0 else 0.0
+            }
+            for row in category_totals
+        ]
+
+        return render_template("profile.html", user=user, stats=stats, transactions=transactions, category_breakdown=category_breakdown)
+    finally:
+        conn.close()
 
 
 
