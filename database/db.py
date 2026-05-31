@@ -103,3 +103,41 @@ def seed_db():
         conn.commit()
     finally:
         conn.close()
+
+def get_user_profile(conn, user_id):
+    """Fetches user name, email and creation date"""
+    cursor = conn.execute("SELECT name, email, created_at FROM users WHERE id = ?", (user_id,))
+    return cursor.fetchone()
+
+def get_user_summary(conn, user_id):
+    """Calculates total spent, total expenses count, and top category"""
+    stats = {}
+
+    # Total spent and count
+    cursor = conn.execute("SELECT SUM(amount) as total, COUNT(*) as count FROM expenses WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    stats['total_spent'] = row['total'] if row['total'] else 0.0
+    stats['total_expenses'] = row['count']
+
+    # Top category
+    cursor = conn.execute('''
+        SELECT category FROM expenses
+        WHERE user_id = ?
+        GROUP BY category
+        ORDER BY SUM(amount) DESC
+        LIMIT 1
+    ''', (user_id,))
+    row = cursor.fetchone()
+    stats['top_category'] = row['category'] if row else "None"
+
+    return stats
+
+def get_user_transactions(conn, user_id):
+    """Fetches all expenses for the user, ordered by date descending"""
+    cursor = conn.execute("SELECT date, description, category, amount FROM expenses WHERE user_id = ? ORDER BY date DESC", (user_id,))
+    return cursor.fetchall()
+
+def get_user_category_totals(conn, user_id):
+    """Returns a list of categories and their total spent amounts"""
+    cursor = conn.execute("SELECT category, SUM(amount) as total FROM expenses WHERE user_id = ? GROUP BY category", (user_id,))
+    return cursor.fetchall()
