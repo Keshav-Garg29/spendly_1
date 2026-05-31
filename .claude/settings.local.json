@@ -12,7 +12,10 @@
       "Bash(sqlite3 *)",
       "Bash(git checkout *)",
       "Bash(git cherry-pick *)",
-      "Bash(git apply *)"
+      "Bash(git apply *)",
+      "Read(//c/Users/ASUS/.claude/plugins/cache/agents-observe/agents-observe/0.9.10/skills/observe/**)",
+      "Bash(scripts/cli.sh health *)",
+      "Bash(scripts/cli.sh start *)"
     ]
   }
 }
