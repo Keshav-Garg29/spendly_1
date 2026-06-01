@@ -157,6 +157,10 @@ def profile():
     if not user_id:
         return redirect(url_for('login', error="Please log in to access this page"))
 
+    # Get date filters from query parameters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
     conn = get_db()
     try:
         # User profile data
@@ -167,12 +171,12 @@ def profile():
             "created_at": user_row['created_at']
         }
 
-        # The following sections will be implemented by subagents
-        stats = get_user_summary(conn, user_id)
+        # Filtered data retrieval
+        stats = get_user_summary(conn, user_id, start_date, end_date)
 
-        transactions = [dict(row) for row in get_user_transactions(conn, user_id)]
+        transactions = [dict(row) for row in get_user_transactions(conn, user_id, start_date, end_date)]
 
-        category_totals = get_user_category_totals(conn, user_id)
+        category_totals = get_user_category_totals(conn, user_id, start_date, end_date)
         total_spent = stats['total_spent']
         category_breakdown = [
             {
@@ -183,7 +187,13 @@ def profile():
             for row in category_totals
         ]
 
-        return render_template("profile.html", user=user, stats=stats, transactions=transactions, category_breakdown=category_breakdown)
+        return render_template("profile.html",
+                               user=user,
+                               stats=stats,
+                               transactions=transactions,
+                               category_breakdown=category_breakdown,
+                               start_date=start_date,
+                               end_date=end_date)
     finally:
         conn.close()
 
