@@ -40,6 +40,37 @@
             </div>
         </div>
 
+        {% if start_date or end_date %}
+        <div class="profile-filters">
+            <form class="filter-form" method="GET" action="{{ url_for('profile') }}">
+                <div class="filter-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="filter-input" value="{{ start_date }}">
+                </div>
+                <div class="filter-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="filter-input" value="{{ end_date }}">
+                </div>
+                <button type="submit" class="btn-filter">Filter</button>
+                <a href="{{ url_for('profile') }}" class="clear-filter">Clear Filter</a>
+            </form>
+        </div>
+        {% else %}
+        <div class="profile-filters">
+            <form class="filter-form" method="GET" action="{{ url_for('profile') }}">
+                <div class="filter-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="filter-input">
+                </div>
+                <button type="submit" class="btn-filter">Filter</button>
+            </form>
+        </div>
+        {% endif %}
+
         <div class="profile-summary">
             <h2 class="summary-title">Account Summary</h2>
             <div class="summary-grid">

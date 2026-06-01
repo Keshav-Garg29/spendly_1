@@ -783,9 +783,77 @@ a { color: inherit; text-decoration: none; }
     .hero { padding: 3rem 1rem 2rem; }
 }
 
-/* ------------------------------------------------------------------ */
-/* Profile Page                                                        */
-/* ------------------------------------------------------------------ */
+/* Profile Page Components                                             */
+
+.profile-filters {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    margin-bottom: 2rem;
+}
+
+.filter-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+}
+
+.filter-input {
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    color: var(--ink);
+    outline: none;
+}
+
+.filter-input:focus {
+    border-color: var(--accent);
+}
+
+.btn-filter {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.btn-filter:hover {
+    background: var(--accent);
+}
+
+.clear-filter {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: color 0.2s;
+}
+
+.clear-filter:hover {
+    color: var(--danger);
+}
 
 .profile-section {
     padding: 4rem 2rem;
