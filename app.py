@@ -208,9 +208,62 @@ def profile():
 
 
 
+from datetime import date as py_date
+
 @app.route("/expenses/add")
 def add_expense():
-    return "Add expense — coming in Step 7"
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to add an expense"))
+    return render_template("add_expense.html", today=py_date.today().isoformat())
+
+
+
+@app.route("/expenses/add", methods=["POST"])
+def add_expense_post():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to add an expense"))
+
+    # Get form data
+    amount_str = request.form.get('amount', '').strip()
+    category = request.form.get('category', '').strip()
+    date = request.form.get('date', '').strip()
+    description = request.form.get('description', '').strip()
+
+    # Validation
+    error = None
+    if not amount_str or not category or not date:
+        error = "Amount, category and date are required"
+    elif date > py_date.today().isoformat():
+        error = "Expense date cannot be in the future"
+    else:
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                error = "Amount must be a positive number"
+        except ValueError:
+            error = "Invalid amount format"
+
+
+    if error:
+        return render_template("add_expense.html", error=error), 400
+
+    # Save to database
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, date, description)
+        )
+        conn.commit()
+    except Exception as e:
+        return render_template("add_expense.html", error="An error occurred while saving the expense"), 500
+    finally:
+        conn.close()
+
+    return redirect(url_for('profile'))
+
 
 
 @app.route("/expenses/<int:id>/edit")
