@@ -151,6 +151,15 @@ def logout():
     return redirect(url_for('landing'))
 
 
+@app.route("/analytics")
+def analytics():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to access this page"))
+
+    return render_template("analytics.html")
+
+
 @app.route("/profile")
 def profile():
     user_id = session.get('user_id')
