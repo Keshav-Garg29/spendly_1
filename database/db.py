@@ -155,7 +155,7 @@ def get_user_transactions(conn, user_id, start_date=None, end_date=None):
         where_clause += " AND date <= ?"
         params.append(end_date)
 
-    cursor = conn.execute(f"SELECT date, description, category, amount FROM expenses {where_clause} ORDER BY date DESC", params)
+    cursor = conn.execute(f"SELECT id, date, description, category, amount FROM expenses {where_clause} ORDER BY date DESC", params)
     return cursor.fetchall()
 
 def get_user_category_totals(conn, user_id, start_date=None, end_date=None):
@@ -172,3 +172,16 @@ def get_user_category_totals(conn, user_id, start_date=None, end_date=None):
 
     cursor = conn.execute(f"SELECT category, SUM(amount) as total FROM expenses {where_clause} GROUP BY category", params)
     return cursor.fetchall()
+
+def get_expense_by_id(conn, expense_id, user_id):
+    """Fetches a specific expense by ID if it belongs to the user"""
+    cursor = conn.execute("SELECT * FROM expenses WHERE id = ? AND user_id = ?", (expense_id, user_id))
+    return cursor.fetchone()
+
+def update_expense(conn, expense_id, user_id, amount, category, date, description):
+    """Updates an expense's details if it belongs to the user"""
+    cursor = conn.execute(
+        "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? WHERE id = ? AND user_id = ?",
+        (amount, category, date, description, expense_id, user_id)
+    )
+    return cursor.rowcount
