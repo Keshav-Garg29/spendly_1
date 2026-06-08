@@ -24,7 +24,10 @@
       "mcp__plugin_figma_figma__get_screenshot",
       "mcp__plugin_figma_figma__get_metadata",
       "mcp__plugin_figma_figma__whoami",
-      "mcp__github__list_issues"
+      "mcp__github__list_issues",
+      "Bash(curl *)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :5001)"
     ]
   }
 }

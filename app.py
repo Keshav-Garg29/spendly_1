@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database.db import get_db, init_db, seed_db, get_user_profile, get_user_summary, get_user_transactions, get_user_category_totals
+from database.db import get_db, init_db, seed_db, get_user_profile, get_user_summary, get_user_transactions, get_user_category_totals, get_expense_by_id, update_expense
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
@@ -268,7 +268,83 @@ def add_expense_post():
 
 @app.route("/expenses/<int:id>/edit")
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to edit this expense"))
+
+    conn = get_db()
+    try:
+        expense = get_expense_by_id(conn, id, user_id)
+        if expense is None:
+            return "Expense not found", 404
+
+        return render_template("edit_expense.html",
+                               expense=expense,
+                               today=py_date.today().isoformat())
+    finally:
+        conn.close()
+
+@app.route("/expenses/<int:id>/edit", methods=["POST"])
+def edit_expense_post(id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login', error="Please log in to edit this expense"))
+
+    # Get form data
+    amount_str = request.form.get('amount', '').strip()
+    category = request.form.get('category', '').strip()
+    date = request.form.get('date', '').strip()
+    description = request.form.get('description', '').strip()
+
+    # Validation
+    error = None
+    if not amount_str or not category or not date:
+        error = "Amount, category and date are required"
+    elif date > py_date.today().isoformat():
+        error = "Expense date cannot be in the future"
+    else:
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                error = "Amount must be a positive number"
+        except ValueError:
+            error = "Invalid amount format"
+
+    if error:
+        # We need the expense data to pre-populate the form again on error
+        conn = get_db()
+        try:
+            expense = get_expense_by_id(conn, id, user_id)
+            if expense is None:
+                return "Expense not found", 404
+            # Use submitted data if validation failed to prevent data loss
+            expense_data = {
+                "amount": amount_str,
+                "category": category,
+                "date": date,
+                "description": description
+            }
+            return render_template("edit_expense.html",
+                                   error=error,
+                                   expense=expense_data,
+                                   today=py_date.today().isoformat()), 400
+        finally:
+            conn.close()
+
+    # Save to database
+    conn = get_db()
+    try:
+        rows_affected = update_expense(conn, id, user_id, amount, category, date, description)
+        if rows_affected == 0:
+            return "Expense not found", 404
+        conn.commit()
+    except Exception as e:
+        return render_template("edit_expense.html", error="An error occurred while updating the expense"), 500
+    finally:
+        conn.close()
+
+    return redirect(url_for('profile'))
+
 
 
 @app.route("/expenses/<int:id>/delete")

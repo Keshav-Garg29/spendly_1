@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Expense — Spendly{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">Edit Expense</h1>
+                <p class="auth-subtitle">Update the details of this expenditure</p>
+            </div>
+
+            {% if error %}
+            <div class="auth-error">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form class="auth-form" method="POST">
+                <div class="form-group">
+                    <label for="amount">Amount (₹)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" class="form-input" value="{{ expense.amount if expense else '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" class="form-input" required>
+                        <option value="" disabled {% if not expense or not expense.category %}selected{% endif %}>Select a category</option>
+                        <option value="Food" {% if expense and expense.category == 'Food' %}selected{% endif %}>Food</option>
+                        <option value="Transport" {% if expense and expense.category == 'Transport' %}selected{% endif %}>Transport</option>
+                        <option value="Bills" {% if expense and expense.category == 'Bills' %}selected{% endif %}>Bills</option>
+                        <option value="Health" {% if expense and expense.category == 'Health' %}selected{% endif %}>Health</option>
+                        <option value="Entertainment" {% if expense and expense.category == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+                        <option value="Shopping" {% if expense and expense.category == 'Shopping' %}selected{% endif %}>Shopping</option>
+                        <option value="Other" {% if expense and expense.category == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" class="form-input" max="{{ today }}" value="{{ expense.date if expense else '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <input type="text" id="description" name="description" class="form-input" placeholder="What was this for?" value="{{ expense.description if expense else '' }}">
+                </div>
+
+                <button type="submit" class="btn-submit">Update Expense</button>
+                <div class="auth-footer">
+                    <a href="{{ url_for('profile') }}" class="auth-link">Cancel and go back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
