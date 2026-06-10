@@ -27,7 +27,12 @@
       "mcp__github__list_issues",
       "Bash(curl *)",
       "Bash(netstat -ano)",
-      "Bash(findstr :5001)"
+      "Bash(findstr :5001)",
+      "Bash(git remote *)",
+      "mcp__github__create_pull_request",
+      "Bash(git stash *)",
+      "Bash(git pull *)",
+      "Bash(git branch *)"
     ]
   }
 }
